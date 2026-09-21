@@ -1,0 +1,33 @@
+# Backend .dockerignore
+# Prevents unnecessary files from being sent to Docker build context
+
+# Go build artifacts
+*.exe
+*.test
+*.out
+
+# Version control
+.git
+.gitignore
+
+# Editor / IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Docker files (no need to copy into image)
+Dockerfile
+.dockerignore
+
+# Test coverage files
+coverage.out
+*.coverage
+
+# Air (live reload) tmp dir
+tmp/
+

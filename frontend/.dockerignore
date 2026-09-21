@@ -1,0 +1,37 @@
+# Frontend .dockerignore
+# Prevents unnecessary files from being sent to Docker build context
+
+# Dependencies (will be installed fresh inside container)
+node_modules/
+
+# Nuxt build outputs (will be rebuilt inside container)
+.nuxt/
+.output/
+dist/
+
+# Version control
+.git
+.gitignore
+
+# Editor / IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Docker files
+Dockerfile
+.dockerignore
+
+# Test artifacts
+coverage/
+
+# Environment files (injected via docker-compose, not baked in)
+.env
+.env.local
+.env.*.local
+
