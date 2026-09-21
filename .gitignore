@@ -1,0 +1,37 @@
+# ============================================================
+# .gitignore — maintenance-request-log
+# ============================================================
+
+# Environment files (NEVER commit real secrets)
+.env
+.env.local
+.env.*.local
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ---- Go (backend) ----
+backend/tmp/
+backend/*.exe
+backend/*.test
+backend/*.out
+backend/coverage.out
+
+# ---- Node / Nuxt (frontend) ----
+frontend/node_modules/
+frontend/.nuxt/
+frontend/.output/
+frontend/dist/
+frontend/.cache/
+
+# ---- Docker ----
+# (docker-compose.override.yml is intentionally gitignored for local dev overrides)
+docker-compose.override.yml
+
