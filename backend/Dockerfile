@@ -12,12 +12,19 @@ RUN apk add --no-cache git
 
 WORKDIR /app
 
-# Copy dependency manifests first for layer caching
-COPY go.mod go.sum* ./
-RUN go mod download || go mod tidy
+# Copy go.mod first (no go.sum — we'll generate it)
+COPY go.mod ./
 
-# Copy all source code
+# Copy ALL source code so go mod tidy can see all import statements
 COPY . .
+
+# Run go mod tidy to:
+#   1. Analyze all imports from source files
+#   2. Generate go.sum automatically
+#   3. Download all required module dependencies
+# NOTE: go.sum is excluded from the build context via .dockerignore
+#       so this step always generates a fresh, correct go.sum
+RUN go mod tidy
 
 # Build a statically linked binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
@@ -37,7 +44,7 @@ WORKDIR /app
 # Copy only the compiled binary from builder stage
 COPY --from=builder /app/server .
 
-# Copy migration and seed SQL files (embedded at runtime)
+# Copy migration and seed SQL files (read at runtime by the server)
 COPY --from=builder /app/migrations ./migrations
 COPY --from=builder /app/seeds ./seeds
 
@@ -47,4 +54,3 @@ USER appuser
 EXPOSE 8080
 
 CMD ["./server"]
-

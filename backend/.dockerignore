@@ -6,6 +6,10 @@
 *.test
 *.out
 
+# go.sum is generated inside Docker via 'go mod tidy'
+# Exclude it from build context to avoid version conflicts
+go.sum
+
 # Version control
 .git
 .gitignore
