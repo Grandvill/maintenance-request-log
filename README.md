@@ -115,7 +115,7 @@ The repository includes a declarative `Jenkinsfile` at the root designed for con
 
 ## AI Disclosure (Mandatory Section)
 
-- **Tools Used**: AI Coding Assistants (Gemini / Claude).
+- **Tools Used**: Visual Studio Code With AntiGravity
 - **Assisted Areas**:
   - Drafting initial boilerplate templates for `docker-compose.yml`, multi-stage `Dockerfile`s, and declarative `Jenkinsfile` syntax.
   - Generating utility Tailwind CSS layout classes for table components and timeline markers.
