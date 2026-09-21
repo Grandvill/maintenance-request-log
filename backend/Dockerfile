@@ -13,8 +13,8 @@ RUN apk add --no-cache git
 WORKDIR /app
 
 # Copy dependency manifests first for layer caching
-COPY go.mod go.sum ./
-RUN go mod download
+COPY go.mod go.sum* ./
+RUN go mod download || go mod tidy
 
 # Copy all source code
 COPY . .
