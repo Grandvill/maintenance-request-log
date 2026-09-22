@@ -57,6 +57,16 @@ All permission rules are **strictly enforced on the Go backend server** and cann
 
 ## Architecture & Key Technical Decisions
 
+### Why This Tech Stack?
+
+- **Go (Golang)** was chosen as the backend language because it's a technology I'm already familiar with and have studied before. While I'm not an expert yet, I have a solid enough understanding of the basics — how HTTP handlers work, structs, and packages.
+
+- **Nuxt 3 (Vue.js)** was chosen as the frontend framework because it's a tech stack I'm comfortable with and have used in previous projects. This gave me enough confidence to write the frontend code independently.
+
+- **Docker & Jenkins** were used because they were required by the test specification. I wasn't very familiar with either tool before this project, but I learned while building.
+
+---
+
 ### Backend: Go 1.22 + Chi Router
 - **Why Go?** Fast startup time, minimal resource footprint, single static binary, and strong concurrency model.
 - **Why Chi Router (`go-chi/chi/v5`)?** Minimalist and 100% compatible with standard `net/http`. Allows idiomatic subrouting and clean middleware chaining for role guards.
@@ -115,15 +125,31 @@ The repository includes a declarative `Jenkinsfile` at the root designed for con
 
 ## AI Disclosure (Mandatory Section)
 
-- **Tools Used**: Visual Studio Code With AntiGravity
-- **Assisted Areas**:
-  - Drafting initial boilerplate templates for `docker-compose.yml`, multi-stage `Dockerfile`s, and declarative `Jenkinsfile` syntax.
-  - Generating utility Tailwind CSS layout classes for table components and timeline markers.
-- **Authored by Hand / Carefully Verified**:
-  - Core RBAC authorization logic: Ensuring all database queries enforce `created_by` filtering on the server when accessed by an Operator.
-  - State machine transition rules: Enforcing that only requests with `Submitted` status can be edited by Operators.
-  - Connection retry logic in `internal/database/database.go` to handle Docker database startup race conditions.
-- **Case of Rejection / Rewrite**:
-  - *Scenario*: The AI assistant initially suggested checking roles only on the frontend Nuxt middleware and passing a `can_view_all=true` query parameter from the client.
-  - *Resolution*: This was **firmly rejected**. In accordance with the test requirements (*"all rules must be enforced on the server, not only hidden in the UI"*), the client parameter was removed, and the Go service was rewritten to extract the user's role directly from the verified JWT context and append database query constraints server-side.
+- **Tools Used**: Visual Studio Code with AntiGravity (AI Assistant)
+
+---
+
+### Assisted Areas (AI-Helped)
+
+The following parts were completed **with AI assistance**, because my knowledge in these areas still needs to grow:
+
+- **Backend Go**: Project folder structure, writing middleware (JWT auth, RBAC role guard), PostgreSQL database connection with retry loop, and RBAC unit tests. I understood the logic, but needed help writing correct code following Go best practices.
+
+- **Docker**: Writing multi-stage `Dockerfile`s for the backend (Go) and frontend (Nuxt 3), as well as configuring `docker-compose.yml` so all three services (database, backend, frontend) could run together with health checks.
+
+- **Jenkins (CI/CD)**: Writing the `Jenkinsfile` for the automated pipeline — from checking out code, running unit tests, building Docker images, to smoke testing the `/health` endpoint. This was my first time writing a Jenkinsfile directly.
+
+---
+
+### Authored by Hand
+
+The following parts were written **entirely by me**, because I'm already comfortable with the tech stack:
+
+- **Frontend Nuxt 3**: All files inside the `frontend/` folder — including the login page, request list dashboard, create request form, request detail page, and user management. Since I've built projects with Nuxt before, I was confident enough to write this part on my own.
+
+---
+
+### An Honest Note
+
+I'm not ashamed to admit that I used AI assistance in this project, especially in areas that were new to me like Go and Docker. What matters most is that **I understand every line of code in this project** — this wasn't blind copy-paste. The lengthy debugging process of the Jenkins pipeline also proves that I was genuinely and actively involved in understanding how each component works.
 
