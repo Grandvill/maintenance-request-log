@@ -118,22 +118,34 @@ pipeline {
         }
 
         // =====================================================
-        // Stage 4: Container Smoke Test
+        // Stage 4: Container Smoke Test (Isolated CI Environment)
         // =====================================================
         stage('Smoke Test') {
             steps {
-                echo 'Starting db and backend test containers...'
-                sh 'docker compose up -d db backend'
+                echo 'Starting isolated test containers for CI verification...'
+                sh '''
+                    # Generate temporary override to remove static container names and avoid port collision
+                    cat << 'EOF' > docker-compose.ci.yml
+services:
+  db:
+    container_name: null
+    ports: []
+  backend:
+    container_name: null
+    ports: []
+EOF
+
+                    docker compose -p ci_test -f docker-compose.yml -f docker-compose.ci.yml up -d db backend
+                '''
 
                 echo 'Waiting for backend healthcheck to respond OK...'
                 sh '''
-                    for i in $(seq 1 15); do
-                        # Menggunakan curl di dalam container network agar dapat menjangkau container backend
-                        if docker run --rm --network maintenance-request-log_maintenance_network curlimages/curl:latest -fs http://backend:8080/health; then
-                            echo "Backend healthcheck passed!"
+                    for i in $(seq 1 20); do
+                        if docker run --rm --network ci_test_maintenance_network curlimages/curl:latest -fs http://backend:8080/health; then
+                            echo "Backend healthcheck passed successfully!"
                             exit 0
                         fi
-                        echo "Waiting for service to be healthy... ($i/15)"
+                        echo "Waiting for service to be healthy... ($i/20)"
                         sleep 2
                     done
                     echo "Healthcheck timed out!"
@@ -142,8 +154,11 @@ pipeline {
             }
             post {
                 always {
-                    echo 'Cleaning up test containers and volumes...'
-                    sh 'docker compose down -v --remove-orphans'
+                    echo 'Cleaning up CI test containers and volumes...'
+                    sh '''
+                        docker compose -p ci_test -f docker-compose.yml -f docker-compose.ci.yml down -v --remove-orphans || true
+                        rm -f docker-compose.ci.yml
+                    '''
                 }
             }
         }
