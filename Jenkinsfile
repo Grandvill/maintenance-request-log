@@ -79,18 +79,18 @@ pipeline {
         // =====================================================
         stage('Frontend Build & Check') {
             steps {
-                echo 'Testing frontend build inside Node.js container...'
+                echo 'Verifying frontend build using multi-stage Docker build...'
                 sh '''
-                    docker run --rm \
-                        -v "$(pwd)/frontend:/app" \
-                        -w /app \
-                        node:24-alpine \
-                        sh -c "npm install --no-audit --no-fund && npm run build"
+                    docker build \
+                        --target builder \
+                        -t maintenance-frontend-test \
+                        ./frontend
                 '''
             }
             post {
                 always {
                     echo 'Frontend build stage completed.'
+                    sh 'docker image rm maintenance-frontend-test || true'
                 }
             }
         }
