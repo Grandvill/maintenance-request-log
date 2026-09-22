@@ -126,8 +126,8 @@ pipeline {
                 sh '''
                     export DB_CONTAINER_NAME=ci_test_db
                     export BACKEND_CONTAINER_NAME=ci_test_backend
-                    export POSTGRES_PORT=15432
-                    export BACKEND_PORT=18080
+                    export HOST_POSTGRES_PORT=15432
+                    export HOST_BACKEND_PORT=18080
 
                     docker compose -p ci_test up -d db backend
                 '''
@@ -135,7 +135,7 @@ pipeline {
                 echo 'Waiting for backend healthcheck to respond OK...'
                 sh '''
                     for i in $(seq 1 20); do
-                        if docker run --rm --network ci_test_maintenance_network curlimages/curl:latest -fs http://ci_test_backend:18080/health; then
+                        if docker run --rm --network ci_test_maintenance_network curlimages/curl:latest -fs http://ci_test_backend:8080/health; then
                             echo "Backend healthcheck passed successfully!"
                             exit 0
                         fi
@@ -153,8 +153,8 @@ pipeline {
                     sh '''
                         export DB_CONTAINER_NAME=ci_test_db
                         export BACKEND_CONTAINER_NAME=ci_test_backend
-                        export POSTGRES_PORT=15432
-                        export BACKEND_PORT=18080
+                        export HOST_POSTGRES_PORT=15432
+                        export HOST_BACKEND_PORT=18080
 
                         docker compose -p ci_test down -v --remove-orphans || true
                     '''

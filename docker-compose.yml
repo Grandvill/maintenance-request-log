@@ -11,7 +11,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_secret}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${HOST_POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -37,17 +37,17 @@ services:
         condition: service_healthy   # Wait until Postgres is truly ready
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST:-db}
-      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_PORT: 5432
       POSTGRES_DB: ${POSTGRES_DB:-maintenance_db}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_secret}
-      BACKEND_PORT: ${BACKEND_PORT:-8080}
+      BACKEND_PORT: 8080
       JWT_SECRET: ${JWT_SECRET:-hiroseelectric_super_secret_jwt_key_2026}
       JWT_EXPIRES_IN_HOURS: ${JWT_EXPIRES_IN_HOURS:-24}
       APP_ENV: ${APP_ENV:-development}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
     ports:
-      - "${BACKEND_PORT:-8080}:${BACKEND_PORT:-8080}"
+      - "${HOST_BACKEND_PORT:-8080}:8080"
     networks:
       - maintenance_network
 
