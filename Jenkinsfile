@@ -18,7 +18,6 @@ pipeline {
     options {
         timeout(time: 30, unit: 'MINUTES')
         disableConcurrentBuilds()
-        ansiColor('xterm')
     }
 
     stages {
@@ -65,7 +64,7 @@ pipeline {
                 sh '''
                     docker run --rm \
                         ${BACKEND_TEST_IMAGE} \
-                        go test -v -race ./...
+                        go test -v ./...
                 '''
             }
             post {
@@ -81,7 +80,6 @@ pipeline {
         stage('Frontend Build & Check') {
             steps {
                 echo 'Testing frontend build inside Node.js container...'
-                // Menjalankan build di container node:24-alpine agar tidak memerlukan npm terpasang di host Jenkins
                 sh '''
                     docker run --rm \
                         -v "$(pwd)/frontend:/app" \
