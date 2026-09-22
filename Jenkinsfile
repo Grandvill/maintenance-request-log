@@ -124,18 +124,12 @@ pipeline {
             steps {
                 echo 'Starting isolated test containers for CI verification...'
                 sh '''
-                    # Generate temporary override to remove static container names and avoid port collision
-                    cat << 'EOF' > docker-compose.ci.yml
-services:
-  db:
-    container_name: null
-    ports: []
-  backend:
-    container_name: null
-    ports: []
-EOF
+                    export DB_CONTAINER_NAME=ci_test_db
+                    export BACKEND_CONTAINER_NAME=ci_test_backend
+                    export POSTGRES_PORT=15432
+                    export BACKEND_PORT=18080
 
-                    docker compose -p ci_test -f docker-compose.yml -f docker-compose.ci.yml up -d db backend
+                    docker compose -p ci_test up -d db backend
                 '''
 
                 echo 'Waiting for backend healthcheck to respond OK...'
@@ -156,8 +150,12 @@ EOF
                 always {
                     echo 'Cleaning up CI test containers and volumes...'
                     sh '''
-                        docker compose -p ci_test -f docker-compose.yml -f docker-compose.ci.yml down -v --remove-orphans || true
-                        rm -f docker-compose.ci.yml
+                        export DB_CONTAINER_NAME=ci_test_db
+                        export BACKEND_CONTAINER_NAME=ci_test_backend
+                        export POSTGRES_PORT=15432
+                        export BACKEND_PORT=18080
+
+                        docker compose -p ci_test down -v --remove-orphans || true
                     '''
                 }
             }
