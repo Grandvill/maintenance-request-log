@@ -135,14 +135,15 @@ pipeline {
                 echo 'Waiting for backend healthcheck to respond OK...'
                 sh '''
                     for i in $(seq 1 20); do
-                        if docker run --rm --network ci_test_maintenance_network curlimages/curl:latest -fs http://backend:8080/health; then
+                        if docker run --rm --network ci_test_maintenance_network curlimages/curl:latest -fs http://ci_test_backend:18080/health; then
                             echo "Backend healthcheck passed successfully!"
                             exit 0
                         fi
                         echo "Waiting for service to be healthy... ($i/20)"
                         sleep 2
                     done
-                    echo "Healthcheck timed out!"
+                    echo "Healthcheck timed out! Printing backend logs:"
+                    docker logs ci_test_backend || true
                     exit 1
                 '''
             }
