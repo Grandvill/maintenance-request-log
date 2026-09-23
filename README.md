@@ -1,4 +1,5 @@
 # Factory Maintenance Request Log Portal
+
 **PT. HIROSE ELECTRIC INDONESIA — Technical Take-Home Test**
 
 An internal web application built for factory floor operations: Operators raise maintenance requests when machinery encounters issues, Supervisors review and approve/reject requests, and Admins manage personnel and records.
@@ -27,14 +28,14 @@ docker compose up --build
 
 The database automatically migrates schema and seeds default users on initial startup. You can log in immediately using any of the following accounts:
 
-| Role | Username | Password | Permissions Summary |
-| :--- | :--- | :--- | :--- |
-| **Admin** | `admin` | `admin123` | Full access: CRUD all requests, review, delete, user management |
-| **Supervisor** | `supervisor` | `supervisor123` | View all requests, Approve / Reject requests, raise requests |
-| **Operator 1** | `operator1` | `operator123` | Raise requests, view & edit own requests while `Submitted` |
-| **Operator 2** | `operator2` | `operator123` | Raise requests, view & edit own requests while `Submitted` |
+| Role           | Username     | Password        | Permissions Summary                                             |
+| :------------- | :----------- | :-------------- | :-------------------------------------------------------------- |
+| **Admin**      | `admin`      | `admin123`      | Full access: CRUD all requests, review, delete, user management |
+| **Supervisor** | `supervisor` | `supervisor123` | View all requests, Approve / Reject requests, raise requests    |
+| **Operator 1** | `operator1`  | `operator123`   | Raise requests, view & edit own requests while `Submitted`      |
+| **Operator 2** | `operator2`  | `operator123`   | Raise requests, view & edit own requests while `Submitted`      |
 
-*(Tip: The login page includes one-click "Quick Fill" helper buttons for rapid evaluation).*
+_(Tip: The login page includes one-click "Quick Fill" helper buttons for rapid evaluation)._
 
 ---
 
@@ -42,16 +43,16 @@ The database automatically migrates schema and seeds default users on initial st
 
 All permission rules are **strictly enforced on the Go backend server** and cannot be bypassed via direct API calls:
 
-| Action | Operator | Supervisor | Admin | Enforcement Mechanism |
-| :--- | :---: | :---: | :---: | :--- |
-| **Create request** | ✅ | ✅ | ✅ | Open to all authenticated sessions |
-| **View own requests** | ✅ | ✅ | ✅ | Filtered via SQL parameterized query |
-| **View all requests** | ❌ | ✅ | ✅ | If `role == 'operator'`, SQL appends `AND created_by = $user_id` |
-| **Edit own request (status = Submitted)** | ✅ | ✅ | ✅ | Verified by `Service.UpdateRequest`; rejects if status != `Submitted` |
-| **Edit any request** | ❌ | ❌ | ✅ | Rejects non-admin with `403 Forbidden` |
-| **Approve or reject request** | ❌ | ✅ | ✅ | Guarded by `RequireRoles("supervisor", "admin")` |
-| **Delete a request** | ❌ | ❌ | ✅ | Guarded by `RequireRoles("admin")` |
-| **Create / Edit / Deactivate users** | ❌ | ❌ | ✅ | Guarded by `RequireRoles("admin")` |
+| Action                                    | Operator | Supervisor | Admin | Enforcement Mechanism                                                 |
+| :---------------------------------------- | :------: | :--------: | :---: | :-------------------------------------------------------------------- |
+| **Create request**                        |    ✅    |     ✅     |  ✅   | Open to all authenticated sessions                                    |
+| **View own requests**                     |    ✅    |     ✅     |  ✅   | Filtered via SQL parameterized query                                  |
+| **View all requests**                     |    ❌    |     ✅     |  ✅   | If `role == 'operator'`, SQL appends `AND created_by = $user_id`      |
+| **Edit own request (status = Submitted)** |    ✅    |     ✅     |  ✅   | Verified by `Service.UpdateRequest`; rejects if status != `Submitted` |
+| **Edit any request**                      |    ❌    |     ❌     |  ✅   | Rejects non-admin with `403 Forbidden`                                |
+| **Approve or reject request**             |    ❌    |     ✅     |  ✅   | Guarded by `RequireRoles("supervisor", "admin")`                      |
+| **Delete a request**                      |    ❌    |     ❌     |  ✅   | Guarded by `RequireRoles("admin")`                                    |
+| **Create / Edit / Deactivate users**      |    ❌    |     ❌     |  ✅   | Guarded by `RequireRoles("admin")`                                    |
 
 ---
 
@@ -61,15 +62,6 @@ All permission rules are **strictly enforced on the Go backend server** and cann
 
 - **Go (Golang)** was chosen as the backend language because it's a technology I'm already familiar with and have studied before. While I'm not an expert yet, I have a solid enough understanding of the basics — how HTTP handlers work, structs, and packages.
 
-- **Nuxt 3 (Vue.js)** was chosen as the frontend framework because it's a tech stack I'm comfortable with and have used in previous projects. This gave me enough confidence to write the frontend code independently.
-
-- **Docker & Jenkins** were used because they were required by the test specification. I wasn't very familiar with either tool before this project, but I learned while building.
-
----
-
-### Backend: Go 1.22 + Chi Router
-- **Why Go?** Fast startup time, minimal resource footprint, single static binary, and strong concurrency model.
-- **Why Chi Router (`go-chi/chi/v5`)?** Minimalist and 100% compatible with standard `net/http`. Allows idiomatic subrouting and clean middleware chaining for role guards.
 - **Layered Design**:
   - `cmd/server/main.go`: Entry point, config loader, auto-migration & seeder runner, graceful shutdown.
   - `internal/middleware`: JWT authentication, RBAC role guard, CORS, structured latency logger.
@@ -78,7 +70,8 @@ All permission rules are **strictly enforced on the Go backend server** and cann
   - `internal/users`: Personnel management and account status toggles.
   - `internal/database`: PostgreSQL connection pool with startup retry loop (handles container readiness).
 
-### Frontend: Nuxt 3 + Vue 3 + Tailwind CSS
+- **Nuxt 3 (Vue.js)** was chosen as the frontend framework because it's a tech stack I'm comfortable with and have used in previous projects. This gave me enough confidence to write the frontend code independently.
+
 - **Single Page Application (SPA) Mode (`ssr: false`)**: Chosen for internal operational portals to guarantee consistent client-side JWT handling without SSR hydration mismatches.
 - **Tailwind CSS**: Rapid, clean styling suited for industrial dashboard environments.
 - **Composables**:
@@ -86,7 +79,12 @@ All permission rules are **strictly enforced on the Go backend server** and cann
   - `useApi()`: `$fetch` interceptor injecting Bearer tokens and automatically handling 401 unauthenticated redirects.
   - `useRequests()`: Encapsulated request CRUD methods.
 
+- **Docker & Jenkins** were used because they were required by the test specification. I wasn't very familiar with either tool before this project, but I learned while building.
+
+---
+
 ### Authentication & Token Justification
+
 - The backend issues signed **HMAC-SHA256 JWT tokens** containing `user_id`, `username`, and `role`.
 - Tokens are transmitted via `Authorization: Bearer <token>` and also stored in an **`HttpOnly` cookie** upon login.
 - **Justification**: Bearer headers allow stateless decoupling for headless API testing (e.g. Postman, curl, automated test suites), while `HttpOnly` cookies provide defense-in-depth against client-side Cross-Site Scripting (XSS).
@@ -148,8 +146,3 @@ The following parts were written **entirely by me**, because I'm already comfort
 - **Frontend Nuxt 3**: All files inside the `frontend/` folder — including the login page, request list dashboard, create request form, request detail page, and user management. Since I've built projects with Nuxt before, I was confident enough to write this part on my own.
 
 ---
-
-### An Honest Note
-
-I'm not ashamed to admit that I used AI assistance in this project, especially in areas that were new to me like Go and Docker. What matters most is that **I understand every line of code in this project** — this wasn't blind copy-paste. The lengthy debugging process of the Jenkins pipeline also proves that I was genuinely and actively involved in understanding how each component works.
-
